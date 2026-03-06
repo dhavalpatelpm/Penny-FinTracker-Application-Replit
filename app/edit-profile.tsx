@@ -60,7 +60,7 @@ const CURRENCIES = [
 export default function EditProfileScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const { profile, updateProfile } = useApp();
+  const { profile, updateProfile, themeOverride, setThemeOverride } = useApp();
 
   const [name, setName] = useState(profile.name);
   const [profession, setProfession] = useState(profile.profession);
@@ -336,6 +336,36 @@ export default function EditProfileScreen() {
           </View>
         </View>
 
+        {/* Appearance */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>APPEARANCE</Text>
+          <View style={[styles.themeRow, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+            {([
+              { key: 'light' as const, label: 'Light', icon: 'sunny' as const },
+              { key: 'system' as const, label: 'Auto', icon: 'phone-portrait-outline' as const },
+              { key: 'dark' as const, label: 'Dark', icon: 'moon' as const },
+            ]).map(({ key, label, icon }) => {
+              const active = themeOverride === key;
+              return (
+                <Pressable
+                  key={key}
+                  onPress={() => { setThemeOverride(key); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+                  style={[
+                    styles.themeBtn,
+                    active && { backgroundColor: theme.primary },
+                  ]}
+                  testID={`theme-${key}`}
+                >
+                  <Ionicons name={icon} size={18} color={active ? '#fff' : theme.textSecondary} />
+                  <Text style={[styles.themeBtnText, { color: active ? '#fff' : theme.textSecondary }]}>
+                    {label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
         {/* Save Button */}
         <Pressable
           onPress={handleSave}
@@ -391,6 +421,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter_700Bold',
     color: '#fff',
+  },
+  themeRow: {
+    flexDirection: 'row',
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 4,
+    gap: 4,
+  },
+  themeBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  themeBtnText: {
+    fontSize: 13,
+    fontFamily: 'Inter_600SemiBold',
   },
   scroll: {
     paddingHorizontal: 20,
