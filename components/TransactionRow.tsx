@@ -51,7 +51,7 @@ export default function TransactionRow({ transaction, onEdit }: TransactionRowPr
     return (
       <View style={styles.leftAction}>
         <Animated.View style={[styles.actionContent, { transform: [{ scale }] }]}>
-          <Ionicons name="pencil" size={20} color="#fff" />
+          <Ionicons name="pencil" size={22} color="#fff" />
           <Text style={styles.actionLabel}>Edit</Text>
         </Animated.View>
       </View>
@@ -69,7 +69,7 @@ export default function TransactionRow({ transaction, onEdit }: TransactionRowPr
     return (
       <View style={styles.rightAction}>
         <Animated.View style={[styles.actionContent, { transform: [{ scale }] }]}>
-          <Ionicons name="trash" size={20} color="#fff" />
+          <Ionicons name="trash" size={22} color="#fff" />
           <Text style={styles.actionLabel}>Delete</Text>
         </Animated.View>
       </View>
