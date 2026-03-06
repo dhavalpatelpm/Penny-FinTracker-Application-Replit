@@ -72,6 +72,10 @@ export default function HomeScreen() {
     ]);
   };
 
+  const handleEdit = (tx: Transaction) => {
+    router.push({ pathname: '/add-transaction', params: { editId: tx.id } });
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 600);
@@ -243,6 +247,7 @@ export default function HomeScreen() {
                       key={tx.id}
                       transaction={tx}
                       onDelete={handleDelete}
+                      onEdit={handleEdit}
                     />
                   ))}
                 </View>

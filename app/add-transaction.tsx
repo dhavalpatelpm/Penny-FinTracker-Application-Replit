@@ -43,8 +43,10 @@ function formatDisplay(val: string): string {
 export default function AddTransactionScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const { addTransaction, profile } = useApp();
+  const { addTransaction, updateTransaction, transactions, profile } = useApp();
   const params = useLocalSearchParams<{ editId?: string }>();
+  const editId = params.editId as string | undefined;
+  const isEditing = !!editId;
 
   const [txType, setTxType] = useState<TxType>('expense');
   const [amount, setAmount] = useState('0');
@@ -52,16 +54,29 @@ export default function AddTransactionScreen() {
   const [note, setNote] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
+      if (editId && !loaded) {
+        const tx = transactions.find(t => t.id === editId);
+        if (tx) {
+          setTxType(tx.type as TxType);
+          setAmount(tx.amount.toString());
+          setCategoryId(tx.categoryId);
+          setNote(tx.note ?? '');
+          setDate(tx.date.split('T')[0]);
+          setLoaded(true);
+          return;
+        }
+      }
       AsyncStorage.getItem('@penny_selected_category').then(val => {
         if (val) {
           setCategoryId(val);
           AsyncStorage.removeItem('@penny_selected_category');
         }
       });
-    }, [])
+    }, [editId, loaded, transactions])
   );
 
   const sym = profile.currency.symbol;
@@ -104,13 +119,23 @@ export default function AddTransactionScreen() {
     if (!amt || amt <= 0) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setIsSubmitting(true);
-    await addTransaction({
-      type: txType,
-      amount: amt,
-      categoryId,
-      note,
-      date: new Date(date + 'T' + new Date().toTimeString().slice(0, 8)).toISOString(),
-    });
+    if (isEditing && editId) {
+      await updateTransaction(editId, {
+        type: txType,
+        amount: amt,
+        categoryId,
+        note,
+        date: new Date(date + 'T' + new Date().toTimeString().slice(0, 8)).toISOString(),
+      });
+    } else {
+      await addTransaction({
+        type: txType,
+        amount: amt,
+        categoryId,
+        note,
+        date: new Date(date + 'T' + new Date().toTimeString().slice(0, 8)).toISOString(),
+      });
+    }
     router.dismiss();
     setIsSubmitting(false);
   };
@@ -248,7 +273,9 @@ export default function AddTransactionScreen() {
           >
             <Ionicons name="checkmark-circle" size={22} color="#fff" />
             <Text style={styles.submitBtnText}>
-              {isSubmitting ? 'Adding...' : `Add ${config.label}`}
+              {isSubmitting
+                ? (isEditing ? 'Saving...' : 'Adding...')
+                : (isEditing ? 'Save Changes' : `Add ${config.label}`)}
             </Text>
           </LinearGradient>
         </Pressable>
