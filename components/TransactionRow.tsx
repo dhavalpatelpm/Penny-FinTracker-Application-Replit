@@ -177,20 +177,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 12,
-    gap: 12,
+    paddingHorizontal: 4,
+    gap: 8,
     borderRadius: 16,
   },
   left: {
-    width: 36,
+    width: 28,
     alignItems: 'flex-end',
   },
   time: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: 'Inter_400Regular',
   },
   middle: {
     flex: 1,
+    minWidth: 0,
   },
   categoryName: {
     fontSize: 15,
@@ -203,9 +204,10 @@ const styles = StyleSheet.create({
   },
   right: {
     alignItems: 'flex-end',
+    flexShrink: 0,
   },
   amount: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Inter_700Bold',
   },
 });
