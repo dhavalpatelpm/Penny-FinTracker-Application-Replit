@@ -7,7 +7,6 @@ import {
   TextInput,
   ScrollView,
   Platform,
-  ViewStyle,
 } from 'react-native';
 import { makeShadow } from '@/utils/shadows';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
@@ -122,10 +121,18 @@ export default function AddTransactionScreen() {
   const bottomPad = Platform.OS === 'web' ? 34 : Math.max(insets.bottom, 8);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Drag Handle */}
-      <View style={styles.handle}>
+    <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+      {/* Header */}
+      <View style={styles.header}>
         <View style={[styles.handleBar, { backgroundColor: theme.textTertiary }]} />
+        <Pressable
+          onPress={() => router.dismiss()}
+          style={[styles.closeBtn, { backgroundColor: theme.surface, borderColor: theme.border }]}
+          hitSlop={8}
+          accessibilityLabel="Close"
+        >
+          <Ionicons name="close" size={18} color={theme.textSecondary} />
+        </Pressable>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
@@ -260,8 +267,25 @@ export default function AddTransactionScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  handle: { alignItems: 'center', paddingTop: 12, paddingBottom: 4 },
+  header: {
+    alignItems: 'center',
+    paddingTop: 12,
+    paddingBottom: 4,
+    paddingHorizontal: 20,
+    position: 'relative',
+  },
   handleBar: { width: 36, height: 4, borderRadius: 2 },
+  closeBtn: {
+    position: 'absolute',
+    right: 20,
+    top: 8,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   typeSelector: {
     flexDirection: 'row',
     marginHorizontal: 20,

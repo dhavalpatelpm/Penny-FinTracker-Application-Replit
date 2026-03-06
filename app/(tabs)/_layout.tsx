@@ -87,23 +87,22 @@ function FloatingTabBar({ state, navigation }: BottomTabBarProps) {
             );
           })}
 
-          <View style={styles.fabSlot}>
-            <Pressable
-              onPress={handleAddPress}
-              style={({ pressed }) => [styles.fab, { transform: [{ scale: pressed ? 0.93 : 1 }] }]}
-              accessibilityRole="button"
-              accessibilityLabel="Add Transaction"
+          <Pressable
+            onPress={handleAddPress}
+            style={({ pressed }) => [styles.fabItem, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}
+            accessibilityRole="button"
+            accessibilityLabel="Add Transaction"
+          >
+            <LinearGradient
+              colors={['#FF8C69', '#FF6B6B']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.fabGradient}
             >
-              <LinearGradient
-                colors={['#FF8C69', '#FF6B6B']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.fabGradient}
-              >
-                <Ionicons name="add" size={28} color="#fff" />
-              </LinearGradient>
-            </Pressable>
-          </View>
+              <Ionicons name="add" size={20} color="#fff" />
+            </LinearGradient>
+            <Text style={[styles.tabLabel, { color: theme.tabInactive }]}>Add</Text>
+          </Pressable>
 
           {rightTabs.map((route) => {
             const config = TAB_CONFIG.find(t => t.name === route.name);
@@ -174,22 +173,17 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Inter_500Medium',
   },
-  fabSlot: {
-    width: 72,
+  fabItem: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  fab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    marginBottom: 20,
-    ...(makeShadow('#FF6B6B', 4, 12, 0.4, 8) as object),
+    paddingVertical: 8,
+    gap: 2,
   },
   fabGradient: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
