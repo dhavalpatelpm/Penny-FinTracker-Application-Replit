@@ -6,6 +6,8 @@ import {
   ScrollView,
   Pressable,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +16,8 @@ import GlassCard from '@/components/GlassCard';
 import DonutChart from '@/components/DonutChart';
 import GradientBackground from '@/components/GradientBackground';
 import { getCategoryById } from '@/constants/categories';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 
 const PERIODS = ['Week', 'Month', 'Year'] as const;
 type Period = typeof PERIODS[number];
@@ -41,6 +45,7 @@ export default function AnalyticsScreen() {
   const [activePeriod, setActivePeriod] = useState<Period>('Month');
   const [activeType, setActiveType] = useState<'expense' | 'income'>('expense');
 
+  const [isExporting, setIsExporting] = useState(false);
   const { start, end, label } = getDateRange(activePeriod);
 
   const filtered = useMemo(() =>
@@ -73,13 +78,152 @@ export default function AnalyticsScreen() {
 
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
 
+  const allExpenses = useMemo(() =>
+    transactions.filter(t => { const d = new Date(t.date); return d >= start && d <= end && t.type === 'expense'; }),
+    [transactions, start, end]);
+  const allIncome = useMemo(() =>
+    transactions.filter(t => { const d = new Date(t.date); return d >= start && d <= end && t.type === 'income'; }),
+    [transactions, start, end]);
+  const totalExpense = allExpenses.reduce((s, t) => s + t.amount, 0);
+  const totalIncome = allIncome.reduce((s, t) => s + t.amount, 0);
+
+  const exportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      const netSavings = totalIncome - totalExpense;
+      const savingsColor = netSavings >= 0 ? '#4ECDC4' : '#FF6B6B';
+
+      const categoryRows = byCategory.map(c => `
+        <tr>
+          <td style="padding:10px 0; border-bottom:1px solid #f0f0f0;">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${c.color};margin-right:8px;"></span>
+            ${c.label}
+          </td>
+          <td style="padding:10px 0; border-bottom:1px solid #f0f0f0; text-align:right; font-weight:600; color:${activeType === 'expense' ? '#FF6B6B' : '#4ECDC4'};">
+            ${sym}${c.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </td>
+          <td style="padding:10px 0; border-bottom:1px solid #f0f0f0; text-align:right; color:#6B7280; font-size:13px;">
+            ${c.pct.toFixed(1)}%
+          </td>
+        </tr>
+      `).join('');
+
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8"/>
+          <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body { font-family: -apple-system, Helvetica, Arial, sans-serif; color: #1A1A2E; background: #fff; padding: 40px; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 36px; padding-bottom: 24px; border-bottom: 2px solid #FF6B6B; }
+            .brand { font-size: 28px; font-weight: 800; color: #FF6B6B; letter-spacing: -0.5px; }
+            .meta { text-align: right; font-size: 13px; color: #6B7280; line-height: 1.6; }
+            .period { font-size: 14px; font-weight: 600; color: #1A1A2E; }
+            .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 36px; }
+            .card { background: #f9f9fb; border-radius: 16px; padding: 20px; border: 1px solid #efefef; }
+            .card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #9CA3AF; margin-bottom: 8px; }
+            .card-value { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+            .income { color: #4ECDC4; }
+            .expense { color: #FF6B6B; }
+            .savings-val { color: ${savingsColor}; }
+            h2 { font-size: 16px; font-weight: 700; color: #1A1A2E; margin-bottom: 16px; }
+            table { width: 100%; border-collapse: collapse; }
+            th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #9CA3AF; padding: 0 0 12px 0; border-bottom: 2px solid #f0f0f0; }
+            th:last-child, td:last-child { text-align: right; }
+            th:nth-child(2), td:nth-child(2) { text-align: right; }
+            .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #f0f0f0; font-size: 12px; color: #9CA3AF; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="brand">Penny</div>
+              <div style="font-size:14px;color:#6B7280;margin-top:4px;">Personal Finance Report</div>
+            </div>
+            <div class="meta">
+              <div class="period">${label}</div>
+              <div>Generated ${dateStr}</div>
+              ${profile.name ? `<div style="margin-top:4px;font-weight:600;color:#1A1A2E;">${profile.name}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="summary">
+            <div class="card">
+              <div class="card-label">Total Income</div>
+              <div class="card-value income">${sym}${totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            </div>
+            <div class="card">
+              <div class="card-label">Total Expenses</div>
+              <div class="card-value expense">${sym}${totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            </div>
+            <div class="card">
+              <div class="card-label">Net Savings</div>
+              <div class="card-value savings-val">${netSavings >= 0 ? '+' : ''}${sym}${Math.abs(netSavings).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            </div>
+          </div>
+
+          ${byCategory.length > 0 ? `
+          <h2>${activeType === 'expense' ? 'Expense' : 'Income'} Breakdown</h2>
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align:left;">Category</th>
+                <th>Amount</th>
+                <th>Share</th>
+              </tr>
+            </thead>
+            <tbody>${categoryRows}</tbody>
+          </table>
+          ` : '<p style="color:#6B7280;text-align:center;padding:40px 0;">No transactions recorded for this period.</p>'}
+
+          <div class="footer">Generated by Penny — Personal Finance Tracker</div>
+        </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html, base64: false });
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: `Penny Analytics — ${label}`,
+          UTI: 'com.adobe.pdf',
+        });
+      } else {
+        Alert.alert('Sharing unavailable', 'PDF sharing is not available on this device.');
+      }
+    } catch {
+      Alert.alert('Export failed', 'Could not generate the PDF. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <GradientBackground style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scroll, { paddingTop: topPad + 8 }]}
       >
-        <Text style={[styles.pageTitle, { color: theme.textPrimary }]}>Analytics</Text>
+        <View style={styles.titleRow}>
+          <Text style={[styles.pageTitle, { color: theme.textPrimary }]}>Analytics</Text>
+          <Pressable
+            onPress={exportPDF}
+            disabled={isExporting}
+            style={({ pressed }) => [
+              styles.shareBtn,
+              { backgroundColor: theme.surface, borderColor: theme.border, opacity: pressed || isExporting ? 0.65 : 1 },
+            ]}
+          >
+            {isExporting
+              ? <ActivityIndicator size="small" color={theme.primary} />
+              : <Ionicons name="share-outline" size={20} color={theme.primary} />
+            }
+          </Pressable>
+        </View>
 
         {/* Period Selector */}
         <View style={[styles.pillRow, { backgroundColor: theme.surface, borderColor: theme.border }]}>
@@ -186,10 +330,23 @@ export default function AnalyticsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scroll: { paddingHorizontal: 20 },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
   pageTitle: {
     fontSize: 28,
     fontFamily: 'Inter_700Bold',
-    marginBottom: 20,
+  },
+  shareBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pillRow: {
     flexDirection: 'row',
