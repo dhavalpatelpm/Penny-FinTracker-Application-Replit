@@ -46,7 +46,7 @@ function RootLayoutNav() {
         name="category-picker"
         options={{
           presentation: "formSheet",
-          sheetAllowedDetents: [0.85],
+          sheetAllowedDetents: [1.0],
           sheetGrabberVisible: true,
           headerShown: false,
           contentStyle: { backgroundColor: "transparent" },
