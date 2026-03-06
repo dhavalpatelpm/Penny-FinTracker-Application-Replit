@@ -1,0 +1,781 @@
+You are building an enterprise-grade, App Store & Google Play ready Personal Finance 
+Tracker mobile application. You are acting as Senior Product Designer, Senior Architect, 
+and President of Product simultaneously. Every pixel, every interaction, every data flow 
+must be production quality. No shortcuts.
+
+Reference UI: A warm, playful-yet-professional finance app with colorful category icons, 
+donut/pie charts for expense breakdowns, horizontal bar charts per category, clean card 
+layouts, bottom tab navigation, and a soft warm color palette. Think: friendly but powerful.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏗️ TECH STACK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mobile:
+- React Native + Expo SDK 51 (managed workflow)
+- TypeScript (strict mode, no 'any')
+- Expo Router v3 (file-based routing: tabs + stacks + modals)
+- React Native Reanimated 3 (all animations)
+- React Native Gesture Handler (swipe, drag interactions)
+- Victory Native XL (charts: pie, donut, bar, line, area)
+- React Native Linear Gradient (liquid glass + backgrounds)
+- Expo Blur (BlurView for glass morphism effect)
+- React Native MMKV (ultra-fast local storage, persisted state)
+- Zustand (global state management)
+- React Hook Form + Zod (form validation)
+- React Native Date Picker (Expo-compatible)
+- Expo Print + Expo Sharing (PDF generation + share sheet)
+- React Native SVG (custom icons and illustrations)
+- Expo Haptics (haptic feedback on all interactions)
+- Expo Font (custom fonts)
+- React Native Safe Area Context (safe areas on all devices)
+- React Native Keyboard Avoiding View (form UX)
+- Lottie React Native (animated illustrations for empty states/onboarding)
+- date-fns (all date formatting and calculations)
+- Lucide React Native (base icon set)
+
+Backend (Lightweight, Scalable):
+- Node.js + Express + TypeScript
+- PostgreSQL via Supabase (auth + database + realtime)
+- Supabase JS Client (from mobile app directly)
+- Prisma ORM (schema management)
+- Anthropic Claude API claude-sonnet-4-20250514 (AI suggestions page)
+- Row Level Security (RLS) on all Supabase tables
+- Supabase Auth (email/password + magic link)
+
+Architecture Pattern:
+- Offline-first: all data cached in MMKV, synced to Supabase when online
+- Optimistic UI updates (instant feedback, background sync)
+- Repository pattern for data access layer
+- Shared TypeScript types across app
+- Feature-based folder structure (not type-based)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎨 DESIGN SYSTEM — LIQUID GLASS + WARM PLAYFUL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Aesthetic Direction:
+- PRIMARY FEEL: Warm, friendly, trustworthy — like the reference image
+- Soft warm cream/peach backgrounds in light mode
+- Rich deep navy/charcoal in dark mode
+- Colorful, rounded category icons (each category has unique color + emoji/illustration)
+- LIQUID GLASS cards: BlurView + semi-transparent backgrounds + soft borders
+- Everything rounded: borderRadius 20–32px on cards, 50px on pills/chips
+- Subtle drop shadows (not harsh — soft elevation)
+- Playful micro-animations on every interaction (Reanimated 3)
+
+Light Mode Colors:
+  Background:     #FFF8F0  (warm cream)
+  Surface:        rgba(255,255,255,0.75)  (glass card)
+  Surface2:       rgba(255,240,225,0.6)
+  Primary:        #FF6B6B  (coral red — expense)
+  Success:        #4ECDC4  (teal — income)
+  Savings:        #45B7D1  (sky blue)
+  Warning:        #FFA726  (amber)
+  Text Primary:   #1A1A2E
+  Text Secondary: #6B7280
+  Border:         rgba(255,255,255,0.4)
+  Accent:         #FF8C69  (salmon)
+
+Dark Mode Colors:
+  Background:     #0D0D1A
+  Surface:        rgba(255,255,255,0.06)
+  Surface2:       rgba(255,255,255,0.03)
+  Primary:        #FF6B6B
+  Success:        #4ECDC4
+  Savings:        #45B7D1
+  Text Primary:   #F0F0F5
+  Text Secondary: #9CA3AF
+  Border:         rgba(255,255,255,0.08)
+
+Glass Card Style (apply to all cards):
+  backgroundColor: rgba(255,255,255,0.15)  // light / rgba(255,255,255,0.05) dark
+  BlurView intensity: 20
+  borderWidth: 1
+  borderColor: rgba(255,255,255,0.3)
+  borderRadius: 24
+  shadow: { color:'#000', offset:{0,8}, opacity:0.08, radius:24, elevation:8 }
+
+Typography:
+  Display/Headings: "Nunito" (rounded, warm, friendly) — weights 700, 800
+  Body: "DM Sans" — weights 400, 500, 600
+  Numbers/Amounts: "Space Grotesk" (mono-spaced feel, great for numbers)
+  Load via expo-font from Google Fonts
+
+Category Icon Style:
+  - Each category: colored rounded square background (pastel tones) + emoji or SVG icon
+  - Size: 48x48 on lists, 56x56 on add transaction screen, 36x36 on compact views
+  - 200+ categories across: Food, Drink, Transport, Shopping, Health, Entertainment, 
+    Housing, Education, Travel, Business, Utilities, Personal Care, Gifts, Investments,
+    Salary, Freelance, Rental, Bonus, Emergency Fund, Vacation Fund, etc.
+  - Each category has: name, emoji, background color (from curated palette), type
+
+Animations (Reanimated 3):
+  - Page transitions: slide from right (stack), fade+scale (modal)
+  - Cards: staggered fade-up on mount (50ms delay between cards)
+  - Numbers: animated count-up when balance/totals appear
+  - Charts: draw animation on mount (Victory Native XL built-in)
+  - FAB: spring scale on press, rotate icon when open
+  - Tab bar: scale+color transition on tab change
+  - Swipe-to-delete: drag gesture with red delete reveal
+  - Add transaction button: ripple + haptic on press
+  - Modal sheet: spring slide-up from bottom
+  - Theme toggle: smooth interpolated color transitions
+
+Haptics (Expo Haptics):
+  - Light impact: any button press
+  - Medium impact: successful add/delete transaction
+  - Heavy impact: destructive action confirmation
+  - Selection feedback: category selection, toggle switches
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📱 NAVIGATION STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Bottom Tab Navigator (5 tabs, custom tab bar):
+  🏠 Home (Dashboard)
+  📊 Analytics
+  ➕ Add (center FAB — elevated, colored, large)
+  📋 Reports  
+  🤖 AI
+
+Stack on top of tabs:
+  - Transaction Detail screen
+  - Category Management screen
+  - Budget Setup screen
+  - Settings screen
+  - Profile screen
+  - PDF Preview screen
+
+Modal screens (bottom sheet, 85% height):
+  - Add/Edit Transaction
+  - Category Picker
+  - Date Picker
+  - Filter Options
+  - Share Options
+
+Custom Tab Bar:
+  - Floating pill shape (not full-width)
+  - Glass effect background
+  - Animated indicator that slides between tabs
+  - Center FAB elevated above tab bar with shadow + gradient background
+  - Safe area aware (handles iPhone home indicator)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 ONBOARDING FLOW (First Launch Only)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5-screen animated onboarding with Lottie animations:
+
+Screen 1 — Welcome Splash:
+  - App logo animation (Lottie: coins flying, piggy bank)
+  - Tagline: "Your money, beautifully organized"
+  - Animated gradient background (warm peach to coral)
+  - "Get Started" button with spring animation
+  - Skip option top-right
+
+Screen 2 — Tell Us About You:
+  Fields (one at a time, animated slide-in):
+  - Full Name (text input, "What should we call you?")
+  - Profession (dropdown picker: Student, Employed, Self-employed, 
+    Freelancer, Business Owner, Retired, Other)
+  - Email Address (keyboard: email type, validation)
+  All fields: glass morphism input style, floating labels, 
+  validation inline (green checkmark when valid)
+  Character limit on name: 50 chars
+  
+Screen 3 — Currency Preference:
+  - "Where are you based?" subtitle
+  - Searchable currency list (100+ currencies)
+  - Each currency item: flag emoji + currency name + symbol + code
+  - Selected currency shows large symbol with bounce animation
+  - Popular currencies at top: USD $, EUR €, GBP £, INR ₹, AED د.إ, 
+    JPY ¥, CAD $, AUD $, CHF ₣, SGD $, SAR ﷼, CNY ¥
+  - Currency symbol persisted globally — shown on ALL money amounts throughout app
+  - Search filters list in real-time
+
+Screen 4 — Set Your Monthly Budget (Optional):
+  - "Set a budget goal to stay on track"
+  - Large number input (currency symbol prefix, animated)
+  - Slider for visual budget setting
+  - "Skip for now" option
+  - Budget categories quick-select (top 5: Food, Transport, Housing, 
+    Entertainment, Shopping) with amount fields
+
+Screen 5 — You're All Set!:
+  - Lottie celebration animation (confetti, fireworks)
+  - Personalized: "Welcome, [Name]! 🎉"
+  - Summary card showing: name, profession, currency selected
+  - "Start Tracking" CTA button
+  - Haptic: heavy impact on button press
+
+Onboarding State:
+  - Persisted in MMKV (never shown again after completion)
+  - Progress dots indicator on all screens
+  - Back navigation between screens
+  - All data saved to Supabase user profile on completion
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📱 SCREEN 1: DASHBOARD (HOME)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Header:
+  - Left: Avatar circle (initials, colored) + "Good morning, [Name]" 
+  - Right: Notification bell + Theme toggle (sun/moon)
+  - Month/Year pill selector (tap to change period)
+
+Hero Balance Card (Glass, full-width, gradient):
+  - "Total Balance" label
+  - Large animated number: [currency symbol][amount] (count-up animation)
+  - Row below: ↑ Income [amount] | ↓ Expenses [amount] | 🏦 Savings [amount]
+  - Subtle animated background (slow gradient shift)
+  - Small mascot illustration top-right (like reference image cat)
+
+Quick Action Icons Row (horizontal scroll):
+  - Ledger 📒 | Recurring 🔄 | Category 📂 | Reimburse 💸 | Bookmarks 🔖
+  - Each: rounded square glass card + label below
+  - Tap: navigate to respective screen with spring animation
+
+Recent Transactions (grouped by date like reference):
+  - Section headers: "Dec 31, Tue" with daily total on right (e.g. "+0  -261")
+  - Each transaction row:
+    * Time on left (e.g. "23:00 ▶")
+    * Category icon (colored rounded square)
+    * Category name + subcategory
+    * Two small coin/badge icons (gamification element)
+    * Amount (red for expense, green for income, blue for savings)
+  - Swipe left: delete (red) / edit (blue) actions revealed
+  - Tap: opens transaction detail modal
+  - Load more on scroll (pagination, 20 per page)
+  - Empty state: Lottie animation + "No transactions yet. Add your first one!"
+
+Floating Action Button (FAB):
+  - Center of tab bar, elevated
+  - Coral/salmon gradient background
+  - "+" icon, rotates 45° when add modal opens
+  - On press: bottom sheet slides up with 3 options:
+    * 💸 Add Expense (red)
+    * 💰 Add Income (green)  
+    * 🏦 Add Savings (blue)
+  - Each option: animated stagger pop-up
+  - Backdrop dims when open
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+➕ ADD TRANSACTION SCREEN (Modal Sheet)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Type Selector (top):
+  - Segmented pill: Expense 💸 | Income 💰 | Savings 🏦
+  - Background color changes per type (red/green/blue tint)
+  - Smooth animated sliding indicator
+
+Amount Input:
+  - Giant centered number display (48px font, Space Grotesk)
+  - Currency symbol prefix (from user's onboarding choice)
+  - Custom numpad (large, easy to tap):
+    * 1-9, 0, decimal point, backspace
+    * Numpad styled with glass effect
+    * Haptic on each key press
+  - Animated: number slides in from bottom on key press
+
+Fields below amount:
+  - Category (tap to open full-screen category picker):
+    * Shows selected category icon + name
+    * Glass card style
+  - Date (tap to open date picker):
+    * Shows formatted date (e.g. "Today, Dec 31")
+    * Calendar modal with month view
+  - Note/Description (text input, optional):
+    * "Add a note..." placeholder
+    * 100 char limit with counter
+  - Recurring Toggle:
+    * Toggle switch (animated)
+    * If on: frequency selector (Daily / Weekly / Monthly / Yearly)
+  - Attachment (optional photo):
+    * Small camera icon to add receipt photo
+    * Expo Image Picker
+
+Submit Button:
+  - Full-width, type-colored gradient
+  - "Add Expense" / "Add Income" / "Add Savings" (dynamic label)
+  - Loading spinner on submit
+  - Success: sheet dismisses + success haptic + toast notification
+  - Validation: amount > 0, category selected required
+
+Category Picker (Full Screen):
+  - Tabs: Expense Categories | Income Categories | Savings Goals
+  - Search bar at top
+  - Grid layout: 4 columns, icon cards
+  - 200+ categories organized by group:
+    EXPENSE: Food & Dining (Food, Coffee, Drink, Dessert, Noodle, Fruit),
+    Transport (Car, Bus, Plane, Train, Taxi, Fuel),
+    Shopping (Clothes, Shoes, Watch, Bag, Cosmetics),
+    Health (Pill, Medical, Tooth, Hospital, Gym),
+    Entertainment (Game, Movie, Music, Sport, Party),
+    Home (Rent, Utilities, Furniture, Internet),
+    Education (Books, Course, School, Pen),
+    Personal (Clean, Haircut, Tools),
+    Travel (Hotel, Tourism), Other (Gifts, Tools)
+    INCOME: Salary, Freelance, Business, Investment, Rental, Bonus, 
+    Interest, Cash, Gift, Other Income
+    SAVINGS: Emergency Fund, Vacation, Home Purchase, Education Fund,
+    Retirement, Car Fund, Wedding, Investment Portfolio
+  - Each category: colored icon card, name label
+  - Selected: checkmark overlay + scale animation
+  - "Add Custom Category" button at bottom
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 SCREEN 2: ANALYTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Period Selector (top):
+  - Pills: Daily | Weekly | Monthly | Yearly
+  - Date range display: "Monthly · Dec 2024" (like reference)
+  - Left/right arrow to navigate periods
+  - Tap date: calendar picker
+
+Summary Row:
+  - Expenses ▼ [amount in red] | Income ▲ [amount in green]
+  - Net balance below: "[currency][amount]" with ↑↓ indicator
+
+Search Bar:
+  - "Search by amount or remark"
+  - Glass morphism style
+  - Real-time filter of transactions below
+
+Expense Breakdown Section:
+  - Section header "Expenses ▶" (tap to see full list)
+  - Donut chart (Victory Native): colored segments per category
+  - Legend on right: category name + percentage (like reference)
+  - Below chart: horizontal bar list per category:
+    * Icon + name on left
+    * Colored progress bar (width = % of total)
+    * Amount + percentage on right
+    * Sorted by amount descending
+
+Income Breakdown Section:
+  - Same layout as expenses but for income sources
+  - Different color palette (greens/teals)
+
+Savings Section:
+  - Goal progress cards (per savings category)
+  - Circular progress ring per goal
+  - Amount saved / target amount
+
+Trends Section:
+  - Line chart: 6-month income vs expense trend
+  - Area chart: savings growth over time
+  - All charts interactive (tap data point = tooltip with exact value)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 SCREEN 3: REPORTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Report Type Selector:
+  - Cards: Daily 📅 | Weekly 📆 | Monthly 🗓️
+  - Tap to select period for report generation
+
+Period Navigator:
+  - "< December 2024 >"
+  - Left/right arrows to change period
+
+Report Preview Card (glass, scrollable):
+  - Header: App logo + "Financial Report" + period
+  - User name + currency
+  - Summary boxes: Total Income | Total Expenses | Net Savings | Savings Rate%
+  - Top Categories chart (mini donut)
+  - Transaction table (date, category, amount)
+  - AI-generated insight paragraph (1-2 sentences)
+  - Budget status: On Track ✅ / Over Budget ⚠️
+
+Export & Share:
+  - "Generate PDF" button → renders report as PDF (Expo Print)
+  - PDF Preview screen before sharing
+  - Share Sheet (Expo Sharing):
+    * Share via WhatsApp, iMessage, Email, Telegram, etc.
+    * "Send to Family" quick-share option
+    * Download to Files app
+    * AirDrop (iOS)
+  - Native share sheet (feels like a real app, not a web app)
+
+Past Reports List:
+  - History of generated reports (stored locally + Supabase)
+  - Tap to re-open/re-share any past report
+  - Delete option (swipe)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 SCREEN 4: AI SUGGESTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Design: Clean chat interface, feels like a smart financial advisor
+
+Header:
+  - "AI Financial Advisor" title
+  - Small sparkle ✨ animation on the AI avatar
+  - "Powered by Claude" subtitle (small, subtle)
+  - New Chat button (top right)
+
+AI Avatar:
+  - Animated gradient circle with sparkle Lottie
+  - Pulse animation while thinking
+
+Quick Question Chips (horizontal scroll, shown at bottom):
+  Chips (tap to instantly ask):
+  - "Where am I overspending?"
+  - "How to save more this month?"
+  - "Analyze my habits"
+  - "Budget suggestions"
+  - "Am I on track?"
+  - "Biggest expense?"
+  - "Investment tips"
+  - "Weekly summary"
+  - Chips disappear after use, new contextual ones appear
+
+Chat Interface:
+  - User messages: right-aligned, coral/primary color bubble
+  - AI messages: left-aligned, glass morphism bubble + AI avatar
+  - Timestamps on each message
+  - Typing indicator: animated 3-dot bouncing (while AI responds)
+  - Smooth scroll to bottom on new message
+  - Streamed response (typewriter effect character by character)
+
+AI Context (passed in system prompt):
+  - User's full name, profession, currency
+  - Current month: total income, total expenses, total savings
+  - Top 5 spending categories with amounts
+  - Budget limits vs actual spending per category
+  - Month-over-month change percentages
+  - Savings goals and progress
+  - Recurring transactions
+  System prompt: "You are a friendly, expert personal finance advisor 
+  named 'Finn'. The user's name is [name], profession: [profession], 
+  currency: [currency]. Here is their financial data: [JSON data]. 
+  Give concise, actionable, encouraging advice. Use their currency 
+  symbol. Keep responses under 150 words unless asked for detail. 
+  Be warm and friendly like a trusted friend who is also a financial expert."
+
+AI Response Formatting:
+  - Bold key numbers/amounts
+  - Bullet points for lists
+  - Emoji sparingly for warmth (✅ ⚠️ 💡 💰)
+  - Suggested follow-up chips appear after each AI response
+
+Text Input:
+  - Bottom: glass text input + send button
+  - Keyboard avoiding (message list scrolls up)
+  - Voice input button (Expo Speech) for hands-free
+
+Error Handling:
+  - If API fails: "Finn is taking a short break. Try again in a moment." 
+  - Retry button
+  - Offline: cached last 5 conversations shown
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️ SETTINGS & PROFILE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Profile Section (glass card):
+  - Large avatar (initials circle, colored by name hash)
+  - Full name (editable)
+  - Profession badge
+  - Email
+  - Member since date
+  - Edit Profile button → inline edit mode
+
+Preferences:
+  - Currency (change → applies everywhere instantly)
+  - Theme: Light ☀️ | Dark 🌙 | System 📱
+  - Language (future-ready)
+  - Notifications toggle (budget alerts, weekly summary reminder)
+  - Biometric lock (Face ID / Touch ID via Expo LocalAuthentication)
+
+Budget Settings:
+  - Monthly overall budget limit
+  - Per-category limits (list of categories + amount input)
+  - Alert threshold: 80% / 90% / 100% warning
+
+Data Management:
+  - Export all data as CSV
+  - Export all data as PDF (full history)
+  - Backup to iCloud / Google Drive (future)
+  - Clear all data (with confirmation dialog)
+
+About:
+  - App version
+  - Privacy Policy
+  - Terms of Service
+  - Rate the App (links to App Store)
+  - Share the App
+
+Logout:
+  - Confirmation bottom sheet
+  - Clears local cache (MMKV)
+  - Returns to onboarding splash
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🗄️ DATABASE SCHEMA (Supabase/Prisma)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+users:
+  id (uuid, primary key)
+  email (unique)
+  full_name
+  profession
+  currency_code (e.g. "USD")
+  currency_symbol (e.g. "$")
+  currency_name (e.g. "US Dollar")
+  onboarding_completed (boolean)
+  monthly_budget (decimal, nullable)
+  theme_preference (light/dark/system)
+  created_at, updated_at
+
+transactions:
+  id (uuid)
+  user_id (fk → users)
+  type (EXPENSE | INCOME | SAVING)
+  amount (decimal, precision 10,2)
+  category_id (fk → categories)
+  date (date)
+  note (text, nullable, max 100 chars)
+  is_recurring (boolean)
+  recurring_interval (DAILY|WEEKLY|MONTHLY|YEARLY, nullable)
+  receipt_url (text, nullable)
+  created_at, updated_at
+
+categories:
+  id (uuid)
+  user_id (fk, nullable — null = default/global category)
+  name
+  emoji (text)
+  color (hex string)
+  type (EXPENSE | INCOME | SAVING)
+  group_name (e.g. "Food & Dining", "Transport")
+  is_default (boolean)
+  sort_order (integer)
+
+budgets:
+  id (uuid)
+  user_id (fk)
+  category_id (fk)
+  month (integer 1-12)
+  year (integer)
+  limit_amount (decimal)
+  spent_amount (decimal, computed)
+
+savings_goals:
+  id (uuid)
+  user_id (fk)
+  category_id (fk)
+  goal_name
+  target_amount (decimal)
+  current_amount (decimal)
+  target_date (date, nullable)
+  color (hex)
+  is_completed (boolean)
+
+reports:
+  id (uuid)
+  user_id (fk)
+  type (DAILY | WEEKLY | MONTHLY)
+  period_start (date)
+  period_end (date)
+  pdf_uri (local file path or Supabase storage URL)
+  created_at
+
+ai_conversations:
+  id (uuid)
+  user_id (fk)
+  messages (jsonb array of {role, content, timestamp})
+  created_at, updated_at
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 SECURITY & PERFORMANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Security:
+  - Supabase RLS: users can only read/write their own data
+  - JWT via Supabase Auth (auto-refresh)
+  - Biometric authentication (Expo LocalAuthentication)
+  - App lock after 5 min background (optional, in settings)
+  - No sensitive data in AsyncStorage — use MMKV with encryption key
+  - Anthropic API called via backend proxy (never expose key to client)
+  - Input sanitization on all forms (Zod schemas)
+
+Performance:
+  - MMKV for all local persistence (10x faster than AsyncStorage)
+  - React.memo on all list item components
+  - useMemo for chart data computation
+  - FlatList with getItemLayout for virtualized transaction lists
+  - Image caching (expo-image)
+  - Lazy load analytics charts (only compute when tab is focused)
+  - Background sync (every 5 min when app is open, AppState listener)
+  - Debounce search inputs (300ms)
+  - Pagination on all lists (20 items per page, infinite scroll)
+
+Offline Support:
+  - All reads serve from MMKV cache first
+  - Writes queued when offline, synced when connection restored
+  - NetInfo listener (Expo Network) — show "Offline" banner when no internet
+  - Charts and dashboard work fully offline with cached data
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📁 FOLDER STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/
+├── app/                          (Expo Router file-based routes)
+│   ├── (onboarding)/
+│   │   ├── welcome.tsx
+│   │   ├── about-you.tsx
+│   │   ├── currency.tsx
+│   │   ├── budget-setup.tsx
+│   │   └── all-set.tsx
+│   ├── (auth)/
+│   │   ├── login.tsx
+│   │   └── register.tsx
+│   ├── (tabs)/
+│   │   ├── _layout.tsx           (custom tab bar)
+│   │   ├── index.tsx             (Dashboard)
+│   │   ├── analytics.tsx
+│   │   ├── reports.tsx
+│   │   └── ai.tsx
+│   ├── transaction/
+│   │   ├── add.tsx               (modal)
+│   │   ├── [id].tsx              (detail/edit)
+│   │   └── category-picker.tsx
+│   ├── settings/
+│   │   ├── index.tsx
+│   │   ├── profile.tsx
+│   │   ├── budget.tsx
+│   │   └── categories.tsx
+│   └── _layout.tsx               (root layout, theme provider)
+├── components/
+│   ├── ui/                       (Button, Card, Input, Badge, Modal, Toast)
+│   ├── glass/                    (GlassCard, GlassInput, BlurContainer)
+│   ├── charts/                   (DonutChart, BarChart, LineChart, AreaChart)
+│   ├── transaction/              (TransactionRow, TransactionForm, SwipeRow)
+│   ├── category/                 (CategoryIcon, CategoryGrid, CategoryPicker)
+│   ├── dashboard/                (BalanceCard, QuickActions, RecentList)
+│   ├── ai/                       (ChatBubble, QuickChips, TypingIndicator)
+│   ├── reports/                  (ReportPreview, ReportCard, PDFViewer)
+│   └── navigation/               (CustomTabBar, Header)
+├── features/                     (business logic per feature)
+│   ├── transactions/
+│   ├── analytics/
+│   ├── budget/
+│   ├── reports/
+│   └── ai/
+├── store/                        (Zustand stores)
+│   ├── authStore.ts
+│   ├── transactionStore.ts
+│   ├── categoryStore.ts
+│   ├── themeStore.ts
+│   └── userStore.ts
+├── services/
+│   ├── supabase.ts               (Supabase client)
+│   ├── ai.ts                     (Claude API calls via proxy)
+│   ├── pdf.ts                    (Expo Print PDF generation)
+│   ├── storage.ts                (MMKV wrapper)
+│   └── sync.ts                   (offline sync logic)
+├── hooks/
+│   ├── useTransactions.ts
+│   ├── useAnalytics.ts
+│   ├── useTheme.ts
+│   ├── useCurrency.ts
+│   └── useHaptics.ts
+├── constants/
+│   ├── categories.ts             (all 200+ categories with icon/color/group)
+│   ├── currencies.ts             (100+ currencies with flag/symbol/code)
+│   ├── colors.ts                 (full theme color system)
+│   └── animations.ts            (shared animation configs)
+├── types/
+│   └── index.ts                  (all TypeScript interfaces)
+├── utils/
+│   ├── formatCurrency.ts
+│   ├── dateHelpers.ts
+│   └── chartHelpers.ts
+├── assets/
+│   ├── animations/               (Lottie JSON files)
+│   ├── fonts/                    (Nunito, DM Sans, Space Grotesk)
+│   └── images/
+├── app.json                      (Expo config)
+└── backend/
+    ├── server.ts                 (Express proxy for Claude API)
+    ├── routes/ai.ts
+    └── middleware/auth.ts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ QUALITY GATES — ZERO COMPROMISE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Layout:
+  - Test on: iPhone SE (375px), iPhone 14 (390px), iPhone 14 Pro Max (430px),
+    iPad Mini (768px), Android small (360px), Android large (412px)
+  - ZERO overlapping elements on any screen size
+  - ZERO horizontal scroll (unless intentional carousel)
+  - All content above tab bar (padding-bottom: 90px on all scroll views)
+  - Safe area insets on all screens (top notch + bottom home indicator)
+  - Keyboard pushes content up properly on all form screens
+
+Currency Symbol Rules:
+  - EVERY monetary value in the app uses the user's selected currency symbol
+  - Symbol stored in userStore, accessed via useCurrency() hook
+  - Format: [symbol][amount] e.g. "₹3,580" or "$2,494" or "€1,200"
+  - Large numbers formatted with commas (1,000 not 1000)
+  - Decimal places: always 2 (e.g. $50.00)
+  - Negative amounts: "-[symbol][amount]" e.g. "-$50.00"
+
+Data Accuracy:
+  - All calculations use decimal.js or exact arithmetic (no floating point errors)
+  - Totals always match sum of individual transactions
+  - Charts percentages always sum to 100%
+  - Date handling: always store in UTC, display in user's local timezone
+
+Empty States (REQUIRED on every list):
+  - Beautiful Lottie animation + friendly message + CTA button
+  - Never show a blank white screen
+
+Loading States:
+  - Skeleton screens (not spinners) for all data-fetching screens
+  - Skeleton matches exact layout of loaded content
+  - Smooth fade from skeleton → real content
+
+Error States:
+  - Every API call wrapped in try/catch
+  - User-friendly error messages (never show raw error strings)
+  - Retry button on all error states
+  - Offline detection with helpful message
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 BUILD ORDER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Execute in this exact order:
+
+1.  Expo project scaffold + TypeScript config + folder structure
+2.  Install ALL dependencies (one npm install command)
+3.  Design system: colors.ts, theme provider, GlassCard component
+4.  Custom fonts setup (Nunito, DM Sans, Space Grotesk via expo-font)
+5.  Supabase setup + all database tables + RLS policies + seed data
+6.  Zustand stores setup (auth, user, transactions, theme)
+7.  MMKV storage service + offline sync foundation
+8.  Onboarding flow (all 5 screens, animations, currency picker with 100+ currencies)
+9.  Auth screens (login/register, Supabase auth)
+10. Custom Tab Bar component (floating glass pill style)
+11. Dashboard screen (all sections: balance card, quick actions, transaction list)
+12. Add Transaction modal (custom numpad, category picker, all fields)
+13. Category system (200+ defaults seeded, custom category creation)
+14. Analytics screen (all charts, period selector, breakdowns)
+15. Reports screen (PDF generation with Expo Print, share sheet)
+16. AI Suggestions screen (Claude API via backend proxy, streaming, chips)
+17. Settings + Profile screens
+18. Budget management (limits, alerts, progress tracking)
+19. Dark mode (full theme switch, all components updated)
+20. Polish: animations, haptics, empty states, error states, loading skeletons
+21. Final QA: test every screen at 375px and 430px, verify zero overlaps
+
+Start now. Build the complete application. Make it extraordinary — 
+the kind of app that gets featured on the App Store front page.
+Every screen should feel like it was designed by a team of 20 at 
+a top-tier fintech company. No placeholders. No "TODO" comments. 
+Real, working, beautiful code.
