@@ -322,33 +322,39 @@ export default function AIScreen() {
       )}
 
       {suggestions.length > 0 && !isLoading && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={styles.suggestionsRow}
-          style={[styles.suggestionsScroll, { borderTopColor: theme.separator }]}
-        >
-          {suggestions.map(s => (
-            <Pressable
-              key={s}
-              onPress={() => sendMessage(s)}
-              style={({ pressed }) => [
-                styles.suggestionChip,
-                {
-                  backgroundColor: theme.isDark ? 'rgba(255,107,107,0.12)' : theme.surface,
-                  borderColor: theme.isDark ? 'rgba(255,107,107,0.3)' : theme.border,
-                  opacity: pressed ? 0.7 : 1,
-                },
-              ]}
-            >
-              <Ionicons name="arrow-forward-circle-outline" size={14} color={theme.primary} />
-              <Text style={[styles.suggestionText, { color: theme.textPrimary }]} numberOfLines={1}>
-                {s}
-              </Text>
-            </Pressable>
+        <View style={[styles.suggestionsContainer, { borderTopColor: theme.separator }]}>
+          <Text style={[styles.suggestionsLabel, { color: theme.textTertiary }]}>
+            Suggested questions
+          </Text>
+          {([0, 1] as const).map(row => (
+            <View key={row} style={styles.suggestionsGridRow}>
+              {suggestions.slice(row * 2, row * 2 + 2).map(s => (
+                <Pressable
+                  key={s}
+                  onPress={() => sendMessage(s)}
+                  style={({ pressed }) => [
+                    styles.suggestionChip,
+                    {
+                      backgroundColor: theme.isDark
+                        ? 'rgba(255,107,107,0.1)'
+                        : 'rgba(255,107,107,0.06)',
+                      borderColor: theme.isDark
+                        ? 'rgba(255,107,107,0.35)'
+                        : 'rgba(255,107,107,0.22)',
+                      opacity: pressed ? 0.65 : 1,
+                    },
+                  ]}
+                >
+                  <View style={[styles.suggestionDot, { backgroundColor: theme.primary }]} />
+                  <Text style={[styles.suggestionText, { color: theme.textPrimary }]} numberOfLines={2}>
+                    {s}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={12} color={theme.primary} />
+                </Pressable>
+              ))}
+            </View>
           ))}
-        </ScrollView>
+        </View>
       )}
 
       <View style={[styles.inputBar, { paddingBottom: tabBarHeight + 8, borderTopColor: theme.separator }]}>
@@ -514,33 +520,45 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 3.5,
   },
-  suggestionsScroll: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 12,
-    paddingBottom: 12,
-    flexGrow: 0,
-  },
-  suggestionsRow: {
+  suggestionsContainer: {
     paddingHorizontal: 16,
-    paddingVertical: 2,
-    gap: 8,
+    paddingTop: 14,
+    paddingBottom: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  suggestionsLabel: {
+    fontSize: 11,
+    fontFamily: 'Inter_600SemiBold',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  suggestionsGridRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
   },
   suggestionChip: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 14,
     borderWidth: 1,
-    marginVertical: 2,
+    gap: 8,
+  },
+  suggestionDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    flexShrink: 0,
   },
   suggestionText: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Inter_500Medium',
-    maxWidth: 180,
+    flex: 1,
+    lineHeight: 17,
   },
   inputBar: {
     paddingHorizontal: 16,
