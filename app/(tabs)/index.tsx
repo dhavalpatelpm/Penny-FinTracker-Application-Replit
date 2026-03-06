@@ -163,32 +163,38 @@ export default function HomeScreen() {
 
             <View style={styles.heroStats}>
               <View style={styles.heroStat}>
-                <View style={styles.heroStatIcon}>
-                  <Ionicons name="arrow-up" size={12} color="#4ECDC4" />
+                <View style={[styles.heroStatIcon, { backgroundColor: 'rgba(78,205,196,0.3)' }]}>
+                  <Ionicons name="trending-up" size={13} color="#4ECDC4" />
                 </View>
-                <View>
+                <View style={styles.heroStatText}>
                   <Text style={styles.heroStatLabel}>Income</Text>
-                  <Text style={styles.heroStatValue}>{sym}{income.toLocaleString()}</Text>
+                  <Text style={styles.heroStatValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+                    {sym}{income.toLocaleString()}
+                  </Text>
                 </View>
               </View>
               <View style={styles.heroDivider} />
               <View style={styles.heroStat}>
                 <View style={[styles.heroStatIcon, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                  <Ionicons name="arrow-down" size={12} color="#fff" />
+                  <Ionicons name="trending-down" size={13} color="rgba(255,255,255,0.95)" />
                 </View>
-                <View>
+                <View style={styles.heroStatText}>
                   <Text style={styles.heroStatLabel}>Expenses</Text>
-                  <Text style={styles.heroStatValue}>{sym}{expenses.toLocaleString()}</Text>
+                  <Text style={styles.heroStatValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+                    {sym}{expenses.toLocaleString()}
+                  </Text>
                 </View>
               </View>
               <View style={styles.heroDivider} />
               <View style={styles.heroStat}>
-                <View style={[styles.heroStatIcon, { backgroundColor: 'rgba(69,183,209,0.3)' }]}>
-                  <Ionicons name="save" size={12} color="#45B7D1" />
+                <View style={[styles.heroStatIcon, { backgroundColor: 'rgba(69,183,209,0.35)' }]}>
+                  <Ionicons name="wallet" size={13} color="#6DD5ED" />
                 </View>
-                <View>
+                <View style={styles.heroStatText}>
                   <Text style={styles.heroStatLabel}>Savings</Text>
-                  <Text style={styles.heroStatValue}>{sym}{savings.toLocaleString()}</Text>
+                  <Text style={styles.heroStatValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
+                    {sym}{savings.toLocaleString()}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -353,15 +359,20 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 7,
+    minWidth: 0,
   },
   heroStatIcon: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(78,205,196,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
+  },
+  heroStatText: {
+    flex: 1,
+    minWidth: 0,
   },
   heroStatLabel: {
     color: 'rgba(255,255,255,0.7)',
@@ -375,9 +386,10 @@ const styles = StyleSheet.create({
   },
   heroDivider: {
     width: 1,
-    height: 32,
+    height: 28,
     backgroundColor: 'rgba(255,255,255,0.2)',
-    marginHorizontal: 4,
+    marginHorizontal: 6,
+    flexShrink: 0,
   },
   sectionHeader: {
     flexDirection: 'row',
