@@ -5,8 +5,10 @@ import {
   StyleSheet,
   Animated,
   Alert,
+  Platform,
 } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { makeShadow } from '@/utils/shadows';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import CategoryIcon from './CategoryIcon';
@@ -147,22 +149,27 @@ export default function TransactionRow({ transaction, onEdit }: TransactionRowPr
 
 const styles = StyleSheet.create({
   swipeContainer: {
-    borderRadius: 16,
-    marginVertical: 1,
+    borderRadius: 20,
+    ...(Platform.OS !== 'web' ? makeShadow('#000000', 4, 12, 0.07, 4) as object : {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.07,
+      shadowRadius: 8,
+    }),
   },
   leftAction: {
     width: 88,
     backgroundColor: '#4ECDC4',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: 20,
   },
   rightAction: {
     width: 88,
     backgroundColor: '#FF6B6B',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16,
+    borderRadius: 20,
   },
   actionContent: {
     alignItems: 'center',
@@ -176,10 +183,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 4,
-    gap: 8,
-    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    gap: 12,
+    borderRadius: 20,
   },
   left: {
     width: 28,

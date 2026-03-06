@@ -16,7 +16,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useTheme, useApp, Transaction } from '@/context/AppContext';
 import TransactionRow from '@/components/TransactionRow';
-import GlassCard from '@/components/GlassCard';
 import GradientBackground from '@/components/GradientBackground';
 import { makeShadow } from '@/utils/shadows';
 
@@ -204,7 +203,7 @@ export default function HomeScreen() {
         </View>
 
         {grouped.length === 0 ? (
-          <GlassCard style={styles.emptyCard}>
+          <View style={[styles.emptyCard, { backgroundColor: theme.surface, borderRadius: 24, borderWidth: 1, borderColor: theme.border }]}>
             <View style={styles.emptyState}>
               <View style={[styles.emptyIcon, { backgroundColor: theme.primary + '15' }]}>
                 <Ionicons name="receipt-outline" size={32} color={theme.primary} />
@@ -214,9 +213,9 @@ export default function HomeScreen() {
                 Tap the + button to add your first one
               </Text>
             </View>
-          </GlassCard>
+          </View>
         ) : (
-          <GlassCard style={styles.txCard} padding={16}>
+          <View>
             {grouped.map(([dateKey, txs], groupIdx) => {
               const dayTotal = txs.reduce((sum, t) => {
                 if (t.type === 'income') return sum + t.amount;
@@ -224,8 +223,7 @@ export default function HomeScreen() {
                 return sum;
               }, 0);
               return (
-                <View key={dateKey}>
-                  {groupIdx > 0 && <View style={[styles.groupDivider, { backgroundColor: theme.separator }]} />}
+                <View key={dateKey} style={[styles.dateGroup, groupIdx > 0 && { marginTop: 20 }]}>
                   <View style={styles.dateHeader}>
                     <Text style={[styles.dateLabel, { color: theme.textSecondary }]}>
                       {formatDateHeader(txs[0].date)}
@@ -234,17 +232,19 @@ export default function HomeScreen() {
                       {dayTotal >= 0 ? '+' : ''}{sym}{Math.abs(dayTotal).toFixed(0)}
                     </Text>
                   </View>
-                  {txs.map(tx => (
-                    <TransactionRow
-                      key={tx.id}
-                      transaction={tx}
-                      onEdit={handleEdit}
-                    />
-                  ))}
+                  <View style={styles.cardStack}>
+                    {txs.map(tx => (
+                      <TransactionRow
+                        key={tx.id}
+                        transaction={tx}
+                        onEdit={handleEdit}
+                      />
+                    ))}
+                  </View>
                 </View>
               );
             })}
-          </GlassCard>
+          </View>
         )}
 
         <View style={{ height: 120 }} />
@@ -392,30 +392,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: 'Inter_700Bold',
   },
-  txCard: { padding: 16 },
-  groupDivider: {
-    height: 1,
-    marginVertical: 8,
-  },
+  dateGroup: {},
   dateHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 6,
+    paddingHorizontal: 4,
+    marginBottom: 10,
   },
   dateLabel: {
     fontSize: 13,
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_700Bold',
   },
   dateTotal: {
     fontSize: 13,
     fontFamily: 'Inter_600SemiBold',
+  },
+  cardStack: {
+    gap: 8,
   },
   emptyCard: {},
   emptyState: {
