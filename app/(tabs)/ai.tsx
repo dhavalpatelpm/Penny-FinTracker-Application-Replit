@@ -76,6 +76,24 @@ function getSuggestions(aiResponse: string): string[] {
   return SUGGESTION_SETS.general;
 }
 
+function MarkdownText({ text, style }: { text: string; style: object }) {
+  const segments = text.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <Text style={style}>
+      {segments.map((seg, i) => {
+        if (seg.startsWith('**') && seg.endsWith('**')) {
+          return (
+            <Text key={i} style={[style, { fontFamily: 'Inter_700Bold' }]}>
+              {seg.slice(2, -2)}
+            </Text>
+          );
+        }
+        return <Text key={i}>{seg}</Text>;
+      })}
+    </Text>
+  );
+}
+
 function TypingDots({ color }: { color: string }) {
   const dots = [
     useRef(new Animated.Value(0.3)).current,
@@ -226,10 +244,15 @@ export default function AIScreen() {
         ]}>
           {isEmpty ? (
             <TypingDots color={theme.textTertiary} />
-          ) : (
-            <Text style={[styles.bubbleText, { color: isUser ? '#fff' : theme.textPrimary }]}>
+          ) : isUser ? (
+            <Text style={[styles.bubbleText, { color: '#fff' }]}>
               {item.content}
             </Text>
+          ) : (
+            <MarkdownText
+              text={item.content}
+              style={[styles.bubbleText, { color: theme.textPrimary }]}
+            />
           )}
         </View>
       </View>
@@ -493,12 +516,13 @@ const styles = StyleSheet.create({
   },
   suggestionsScroll: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 10,
-    paddingBottom: 6,
+    paddingTop: 12,
+    paddingBottom: 12,
     flexGrow: 0,
   },
   suggestionsRow: {
     paddingHorizontal: 16,
+    paddingVertical: 2,
     gap: 8,
     flexDirection: 'row',
     alignItems: 'center',
@@ -506,11 +530,12 @@ const styles = StyleSheet.create({
   suggestionChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 9,
     borderRadius: 20,
     borderWidth: 1,
+    marginVertical: 2,
   },
   suggestionText: {
     fontSize: 13,
