@@ -52,6 +52,16 @@ function RootLayoutNav() {
           contentStyle: { backgroundColor: "transparent" },
         }}
       />
+      <Stack.Screen
+        name="edit-profile"
+        options={{
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.95],
+          sheetGrabberVisible: true,
+          headerShown: false,
+          contentStyle: { backgroundColor: "transparent" },
+        }}
+      />
     </Stack>
   );
 }

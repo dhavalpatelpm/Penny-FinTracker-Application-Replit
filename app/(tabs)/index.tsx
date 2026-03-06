@@ -8,7 +8,9 @@ import {
   RefreshControl,
   Platform,
   Alert,
+  Image,
 } from 'react-native';
+import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -87,11 +89,19 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View style={[styles.avatar, { backgroundColor: theme.primary + '22' }]}>
-            <Text style={[styles.avatarText, { color: theme.primary }]}>
-              {profile.name ? profile.name.charAt(0).toUpperCase() : 'P'}
-            </Text>
-          </View>
+          <Pressable
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/edit-profile'); }}
+            style={[styles.avatar, { backgroundColor: theme.primary + '22', overflow: 'hidden' }]}
+            testID="profile-avatar"
+          >
+            {profile.photoUri ? (
+              <Image source={{ uri: profile.photoUri }} style={styles.avatarImg} />
+            ) : (
+              <Text style={[styles.avatarText, { color: theme.primary }]}>
+                {profile.name ? profile.name.charAt(0).toUpperCase() : 'P'}
+              </Text>
+            )}
+          </Pressable>
           <View style={styles.headerCenter}>
             <Text style={[styles.greeting, { color: theme.textSecondary }]}>{getGreeting()}</Text>
             <Text style={[styles.userName, { color: theme.textPrimary }]} numberOfLines={1}>
@@ -225,6 +235,11 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  avatarImg: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   avatarText: {
     fontSize: 18,

@@ -18,6 +18,7 @@ export interface UserProfile {
   currency: { code: string; symbol: string; name: string };
   monthlyBudget: number;
   categoryBudgets: Record<string, number>;
+  photoUri?: string;
 }
 
 export interface AppContextValue {
