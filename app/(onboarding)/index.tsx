@@ -11,6 +11,7 @@ import {
 
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { makeShadow } from '@/utils/shadows';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -148,11 +149,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
-    elevation: 10,
+    ...(makeShadow('#FF6B6B', 8, 20, 0.35, 10) as object),
   },
   logoBadge: {
     position: 'absolute',
@@ -164,11 +161,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...(makeShadow('#000000', 2, 4, 0.1, 3) as object),
   },
   appName: {
     fontSize: 44,
@@ -220,11 +213,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 40,
     borderRadius: 32,
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    ...(makeShadow('#FF6B6B', 6, 16, 0.4, 8) as object),
   },
   ctaText: {
     fontSize: 17,

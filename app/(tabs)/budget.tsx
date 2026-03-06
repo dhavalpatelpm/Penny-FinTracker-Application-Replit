@@ -5,14 +5,18 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  Pressable,
 } from 'react-native';
+import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { useTheme, useApp } from '@/context/AppContext';
 import GlassCard from '@/components/GlassCard';
 import CategoryIcon from '@/components/CategoryIcon';
 import { getCategoryById } from '@/constants/categories';
+import { makeShadow } from '@/utils/shadows';
 
 export default function BudgetScreen() {
   const insets = useSafeAreaInsets();
@@ -103,6 +107,14 @@ export default function BudgetScreen() {
               <Text style={[styles.noBudgetSub, { color: theme.textSecondary }]}>
                 Set a monthly budget to track your spending
               </Text>
+              <Pressable
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/edit-profile'); }}
+                style={({ pressed }) => [styles.setBudgetBtn, { backgroundColor: theme.primary, opacity: pressed ? 0.85 : 1 }]}
+                testID="set-budget-btn"
+              >
+                <Ionicons name="add-circle-outline" size={18} color="#fff" />
+                <Text style={styles.setBudgetBtnText}>Set Budget</Text>
+              </Pressable>
             </View>
           </GlassCard>
         )}
@@ -193,11 +205,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     overflow: 'hidden',
     marginBottom: 28,
-    shadowColor: '#4ECDC4',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
+    ...(makeShadow('#4ECDC4', 8, 20, 0.25, 10) as object),
   },
   budgetCard: {
     padding: 24,
@@ -271,6 +279,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'Inter_400Regular',
     textAlign: 'center',
+    marginBottom: 4,
+  },
+  setBudgetBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+    marginTop: 4,
+  },
+  setBudgetBtnText: {
+    fontSize: 15,
+    fontFamily: 'Inter_700Bold',
+    color: '#fff',
   },
   sectionTitle: {
     fontSize: 18,

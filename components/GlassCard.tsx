@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, StyleSheet, ViewStyle, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Platform } from 'react-native';
 import { useTheme } from '@/context/AppContext';
+import { makeShadow } from '@/utils/shadows';
 
 interface GlassCardProps {
   children: React.ReactNode;
@@ -11,6 +11,8 @@ interface GlassCardProps {
   padding?: number;
   borderRadius?: number;
 }
+
+const cardShadow = makeShadow('#000000', 4, 16, 0.08, 4);
 
 export default function GlassCard({ children, style, intensity = 20, padding = 20, borderRadius = 24 }: GlassCardProps) {
   const theme = useTheme();
@@ -22,6 +24,7 @@ export default function GlassCard({ children, style, intensity = 20, padding = 2
         tint={theme.isDark ? 'dark' : 'light'}
         style={[
           styles.base,
+          cardShadow as ViewStyle,
           {
             borderRadius,
             borderColor: theme.glassBorder,
@@ -39,6 +42,7 @@ export default function GlassCard({ children, style, intensity = 20, padding = 2
     <View
       style={[
         styles.base,
+        cardShadow as ViewStyle,
         {
           backgroundColor: theme.card,
           borderRadius,
@@ -56,10 +60,5 @@ export default function GlassCard({ children, style, intensity = 20, padding = 2
 const styles = StyleSheet.create({
   base: {
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 4,
   },
 });

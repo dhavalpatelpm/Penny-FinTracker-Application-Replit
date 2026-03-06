@@ -8,6 +8,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import { makeShadow } from '@/utils/shadows';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -174,11 +175,7 @@ const styles = StyleSheet.create({
     gap: 12,
     borderWidth: 2,
     borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    ...(makeShadow('#000000', 2, 8, 0.04, 2) as object),
   },
   inputWrapperFocused: {
     borderColor: '#FF6B6B',
@@ -235,11 +232,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 18,
     borderRadius: 32,
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+    ...(makeShadow('#FF6B6B', 4, 12, 0.3, 6) as object),
   },
   nextBtnText: {
     fontSize: 17,

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,15 +9,15 @@ import {
   FlatList,
   ActivityIndicator,
   Platform,
-  KeyboardAvoidingView,
+  Animated,
 } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { fetch } from 'expo/fetch';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useTheme, useApp } from '@/context/AppContext';
-import GlassCard from '@/components/GlassCard';
 import { getApiUrl } from '@/lib/query-client';
 
 interface Message {
@@ -33,6 +33,39 @@ const QUICK_PROMPTS = [
   { label: 'Healthy budget', icon: 'heart' as const, prompt: 'Am I spending within healthy limits based on my income?' },
 ];
 
+function TypingDots({ color }: { color: string }) {
+  const dots = [
+    useRef(new Animated.Value(0.3)).current,
+    useRef(new Animated.Value(0.3)).current,
+    useRef(new Animated.Value(0.3)).current,
+  ];
+
+  useEffect(() => {
+    const animations = dots.map((dot, i) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(i * 160),
+          Animated.timing(dot, { toValue: 1, duration: 320, useNativeDriver: true }),
+          Animated.timing(dot, { toValue: 0.3, duration: 320, useNativeDriver: true }),
+        ])
+      )
+    );
+    animations.forEach(a => a.start());
+    return () => animations.forEach(a => a.stop());
+  }, []);
+
+  return (
+    <View style={styles.typingDots}>
+      {dots.map((dot, i) => (
+        <Animated.View
+          key={i}
+          style={[styles.dot, { backgroundColor: color, opacity: dot }]}
+        />
+      ))}
+    </View>
+  );
+}
+
 export default function AIScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
@@ -45,19 +78,20 @@ export default function AIScreen() {
   const now = new Date();
   const period = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  const recentTxs = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  });
-
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
+    const trimmedText = text.trim();
+    const currentTxs = transactions.filter(t => {
+      const d = new Date(t.date);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    });
+
     const userMsg: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: text.trim(),
+      content: trimmedText,
     };
     const assistantId = (Date.now() + 1).toString();
     const assistantMsg: Message = { id: assistantId, role: 'assistant', content: '' };
@@ -74,9 +108,9 @@ export default function AIScreen() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          transactions: recentTxs,
+          transactions: currentTxs,
           period,
-          question: text.trim(),
+          question: trimmedText,
           profile: { currency: profile.currency, name: profile.name },
         }),
       });
@@ -107,20 +141,25 @@ export default function AIScreen() {
           }
         }
       }
-    } catch (err) {
+    } catch {
       setMessages(prev =>
-        prev.map(m => m.id === assistantId ? { ...m, content: 'Sorry, I had trouble analyzing your data. Please try again.' } : m)
+        prev.map(m => m.id === assistantId
+          ? { ...m, content: 'Sorry, I had trouble analyzing your data. Please try again.' }
+          : m
+        )
       );
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, recentTxs, period, profile]);
+  }, [isLoading, transactions, period, profile]);
 
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
   const bottomPad = Platform.OS === 'web' ? 34 : insets.bottom;
+  const tabBarHeight = 64 + bottomPad;
 
   const renderMessage = ({ item }: { item: Message }) => {
     const isUser = item.role === 'user';
+    const isEmpty = item.content === '' && !isUser;
     return (
       <View style={[styles.msgRow, isUser ? styles.msgRowUser : styles.msgRowAI]}>
         {!isUser && (
@@ -132,14 +171,10 @@ export default function AIScreen() {
           styles.bubble,
           isUser
             ? [styles.userBubble, { backgroundColor: theme.primary }]
-            : [styles.aiBubble, { backgroundColor: theme.surface, borderColor: theme.border, borderWidth: 1 }]
+            : [styles.aiBubble, { backgroundColor: theme.surface, borderColor: theme.border, borderWidth: 1 }],
         ]}>
-          {!isUser && item.content === '' && isLoading ? (
-            <View style={styles.typingDots}>
-              <View style={[styles.dot, { backgroundColor: theme.textTertiary }]} />
-              <View style={[styles.dot, { backgroundColor: theme.textTertiary, marginLeft: 4 }]} />
-              <View style={[styles.dot, { backgroundColor: theme.textTertiary, marginLeft: 4 }]} />
-            </View>
+          {isEmpty ? (
+            <TypingDots color={theme.textTertiary} />
           ) : (
             <Text style={[styles.bubbleText, { color: isUser ? '#fff' : theme.textPrimary }]}>
               {item.content}
@@ -153,10 +188,9 @@ export default function AIScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: theme.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior="padding"
       keyboardVerticalOffset={0}
     >
-      {/* Header */}
       <View style={[styles.header, { paddingTop: topPad + 8 }]}>
         <LinearGradient colors={['#FF8C69', '#FF6B6B']} style={styles.headerIcon}>
           <Ionicons name="sparkles" size={20} color="#fff" />
@@ -167,9 +201,12 @@ export default function AIScreen() {
         </View>
       </View>
 
-      {/* Messages */}
       {messages.length === 0 ? (
-        <ScrollView contentContainerStyle={styles.emptyScroll} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[styles.emptyScroll, { paddingBottom: tabBarHeight + 16 }]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.emptyContent}>
             <LinearGradient colors={['#FF8C69', '#FF6B6B']} style={styles.emptyIcon}>
               <Ionicons name="sparkles" size={28} color="#fff" />
@@ -178,7 +215,6 @@ export default function AIScreen() {
             <Text style={[styles.emptySub, { color: theme.textSecondary }]}>
               I analyze your spending and give personalized financial insights
             </Text>
-
             <View style={styles.quickGrid}>
               {QUICK_PROMPTS.map(q => (
                 <Pressable
@@ -186,7 +222,7 @@ export default function AIScreen() {
                   onPress={() => sendMessage(q.prompt)}
                   style={({ pressed }) => [
                     styles.quickBtn,
-                    { backgroundColor: theme.surface, borderColor: theme.border, opacity: pressed ? 0.7 : 1 }
+                    { backgroundColor: theme.surface, borderColor: theme.border, opacity: pressed ? 0.7 : 1 },
                   ]}
                 >
                   <Ionicons name={q.icon} size={20} color={theme.primary} />
@@ -199,17 +235,18 @@ export default function AIScreen() {
       ) : (
         <FlatList
           ref={flatListRef}
-          data={messages}
+          data={[...messages].reverse()}
+          inverted
           keyExtractor={m => m.id}
           renderItem={renderMessage}
-          contentContainerStyle={styles.messagesList}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+          contentContainerStyle={[styles.messagesList, { paddingBottom: tabBarHeight + 8 }]}
           showsVerticalScrollIndicator={false}
+          keyboardDismissMode="interactive"
+          keyboardShouldPersistTaps="handled"
         />
       )}
 
-      {/* Input Bar */}
-      <View style={[styles.inputBar, { paddingBottom: bottomPad + 90, borderTopColor: theme.separator }]}>
+      <View style={[styles.inputBar, { paddingBottom: tabBarHeight + 8, borderTopColor: theme.separator }]}>
         <View style={[styles.inputRow, { backgroundColor: theme.inputBackground, borderColor: theme.border }]}>
           <TextInput
             style={[styles.input, { color: theme.textPrimary }]}
@@ -219,15 +256,18 @@ export default function AIScreen() {
             placeholderTextColor={theme.textTertiary}
             multiline
             maxLength={300}
-            onSubmitEditing={() => sendMessage(input)}
+            returnKeyType="send"
+            onSubmitEditing={() => { if (!isLoading) sendMessage(input); }}
+            testID="ai-input"
           />
           <Pressable
             onPress={() => sendMessage(input)}
             disabled={isLoading || !input.trim()}
             style={({ pressed }) => [
               styles.sendBtn,
-              { opacity: pressed || isLoading || !input.trim() ? 0.5 : 1 },
+              { opacity: pressed || isLoading || !input.trim() ? 0.4 : 1 },
             ]}
+            testID="ai-send-btn"
           >
             <LinearGradient colors={['#FF8C69', '#FF6B6B']} style={styles.sendGradient}>
               {isLoading
@@ -248,7 +288,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingBottom: 12,
     gap: 12,
   },
   headerIcon: {
@@ -266,14 +306,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter_400Regular',
   },
-  emptyScroll: { flexGrow: 1 },
+  emptyScroll: {
+    flexGrow: 1,
+  },
   emptyContent: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
-    paddingBottom: 100,
+    paddingVertical: 32,
     gap: 12,
+    minHeight: 300,
   },
   emptyIcon: {
     width: 72,
@@ -317,14 +360,14 @@ const styles = StyleSheet.create({
   },
   messagesList: {
     paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingTop: 16,
     gap: 12,
   },
   msgRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 8,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   msgRowUser: { justifyContent: 'flex-end' },
   msgRowAI: { justifyContent: 'flex-start' },
@@ -357,16 +400,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 4,
+    gap: 4,
   },
   dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
   },
   inputBar: {
     paddingHorizontal: 16,
     paddingTop: 12,
-    borderTopWidth: 1,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   inputRow: {
     flexDirection: 'row',

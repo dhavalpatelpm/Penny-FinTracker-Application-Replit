@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { makeShadow } from '@/utils/shadows';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -160,11 +161,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 2,
     borderColor: '#FF6B6B',
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 4,
+    ...(makeShadow('#FF6B6B', 4, 12, 0.15, 4) as object),
   },
   selectedSymbol: { fontSize: 28, fontFamily: 'Inter_700Bold', color: '#FF6B6B', width: 40, textAlign: 'center' },
   selectedCode: { fontSize: 15, fontFamily: 'Inter_700Bold', color: '#1A1A2E' },
@@ -200,7 +197,7 @@ const styles = StyleSheet.create({
   nextBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
     paddingVertical: 18, borderRadius: 32,
-    shadowColor: '#FF6B6B', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+    ...(makeShadow('#FF6B6B', 4, 12, 0.3, 6) as object),
   },
   nextBtnText: { fontSize: 17, fontFamily: 'Inter_700Bold', color: '#fff' },
 });

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { makeShadow } from '@/utils/shadows';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -201,11 +202,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    ...(makeShadow('#000000', 2, 8, 0.06, 3) as object),
   },
   summaryTitle: { fontSize: 13, fontFamily: 'Inter_600SemiBold', color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5 },
   summaryRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
@@ -236,11 +233,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 18,
     borderRadius: 32,
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+    ...(makeShadow('#FF6B6B', 4, 12, 0.3, 6) as object),
   },
   startBtnText: { fontSize: 17, fontFamily: 'Inter_700Bold', color: '#fff' },
 });

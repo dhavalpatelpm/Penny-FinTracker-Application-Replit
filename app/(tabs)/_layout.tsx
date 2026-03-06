@@ -15,6 +15,7 @@ import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/context/AppContext';
+import { makeShadow } from '@/utils/shadows';
 
 const TAB_CONFIG = [
   { name: 'index', icon: 'home-outline' as const, iconFocused: 'home' as const, label: 'Home' },
@@ -149,11 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     overflow: Platform.OS === 'ios' ? 'hidden' : 'visible',
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 12,
+    ...(makeShadow('#000000', 8, 24, 0.12, 12) as object),
   },
   blurBackground: {
     ...StyleSheet.absoluteFillObject,
@@ -187,11 +184,7 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
     marginBottom: 20,
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    ...(makeShadow('#FF6B6B', 4, 12, 0.4, 8) as object),
   },
   fabGradient: {
     width: 56,

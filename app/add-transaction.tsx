@@ -7,7 +7,9 @@ import {
   TextInput,
   ScrollView,
   Platform,
+  ViewStyle,
 } from 'react-native';
+import { makeShadow } from '@/utils/shadows';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -375,11 +377,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 18,
     borderRadius: 32,
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+    ...(makeShadow('#FF6B6B', 4, 12, 0.3, 6) as object),
   },
   submitBtnText: {
     fontSize: 17,

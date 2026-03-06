@@ -18,6 +18,7 @@ import * as Haptics from 'expo-haptics';
 import { useTheme, useApp, Transaction } from '@/context/AppContext';
 import TransactionRow from '@/components/TransactionRow';
 import GlassCard from '@/components/GlassCard';
+import { makeShadow } from '@/utils/shadows';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -108,10 +109,39 @@ export default function HomeScreen() {
               {profile.name || 'Welcome'}
             </Text>
           </View>
-          <Pressable style={[styles.periodBtn, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-            <Ionicons name="calendar-outline" size={14} color={theme.textSecondary} />
+          <View style={[styles.periodRow, { backgroundColor: theme.surface, borderColor: theme.border }]}>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setSelectedPeriod(prev => {
+                  let m = prev.month - 1;
+                  let y = prev.year;
+                  if (m < 0) { m = 11; y -= 1; }
+                  return { year: y, month: m };
+                });
+              }}
+              style={styles.periodArrow}
+              hitSlop={8}
+            >
+              <Ionicons name="chevron-back" size={14} color={theme.textSecondary} />
+            </Pressable>
             <Text style={[styles.periodLabel, { color: theme.textSecondary }]}>{monthLabel}</Text>
-          </Pressable>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setSelectedPeriod(prev => {
+                  let m = prev.month + 1;
+                  let y = prev.year;
+                  if (m > 11) { m = 0; y += 1; }
+                  return { year: y, month: m };
+                });
+              }}
+              style={styles.periodArrow}
+              hitSlop={8}
+            >
+              <Ionicons name="chevron-forward" size={14} color={theme.textSecondary} />
+            </Pressable>
+          </View>
         </View>
 
         {/* Balance Hero Card */}
@@ -254,28 +284,29 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: 'Inter_700Bold',
   },
-  periodBtn: {
+  periodRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 1,
+  },
+  periodArrow: {
+    padding: 4,
   },
   periodLabel: {
     fontSize: 12,
     fontFamily: 'Inter_500Medium',
+    minWidth: 64,
+    textAlign: 'center',
   },
   heroCardWrapper: {
     borderRadius: 28,
     overflow: 'hidden',
     marginBottom: 24,
-    shadowColor: '#FF6B6B',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
+    ...(makeShadow('#FF6B6B', 8, 20, 0.25, 10) as object),
   },
   heroCard: {
     padding: 24,
