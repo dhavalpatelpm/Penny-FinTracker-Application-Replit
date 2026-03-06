@@ -165,7 +165,7 @@ export default function EditProfileScreen() {
   const initial = name ? name.charAt(0).toUpperCase() : 'P';
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: topPad + 16 }]}>
         <Pressable onPress={() => router.back()} style={styles.closeBtn} testID="close-edit-profile">

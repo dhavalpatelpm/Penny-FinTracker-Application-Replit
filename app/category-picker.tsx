@@ -45,7 +45,7 @@ export default function CategoryPickerScreen() {
   const bottomPad = Platform.OS === 'web' ? 34 : Math.max(insets.bottom, 8);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
       {/* Drag handle */}
       <View style={styles.handle}>
         <View style={[styles.handleBar, { backgroundColor: theme.textTertiary }]} />

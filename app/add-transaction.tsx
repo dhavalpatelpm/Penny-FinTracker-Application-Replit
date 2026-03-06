@@ -121,7 +121,11 @@ export default function AddTransactionScreen() {
   const bottomPad = Platform.OS === 'web' ? 34 : Math.max(insets.bottom, 8);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+      {/* Drag handle */}
+      <View style={styles.handle}>
+        <View style={[styles.handleBar, { backgroundColor: theme.textTertiary }]} />
+      </View>
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         {/* Type Selector */}
         <View style={[styles.typeSelector, { backgroundColor: theme.surface, borderColor: theme.border }]}>
@@ -254,6 +258,8 @@ export default function AddTransactionScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  handle: { alignItems: 'center', paddingTop: 8, paddingBottom: 4 },
+  handleBar: { width: 36, height: 4, borderRadius: 2 },
   typeSelector: {
     flexDirection: 'row',
     marginHorizontal: 20,

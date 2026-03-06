@@ -35,31 +35,22 @@ function RootLayoutNav() {
       <Stack.Screen
         name="add-transaction"
         options={{
-          presentation: "formSheet",
-          sheetAllowedDetents: [0.92],
-          sheetGrabberVisible: true,
+          presentation: "modal",
           headerShown: false,
-          contentStyle: { backgroundColor: "transparent" },
         }}
       />
       <Stack.Screen
         name="category-picker"
         options={{
-          presentation: "formSheet",
-          sheetAllowedDetents: [1.0],
-          sheetGrabberVisible: true,
+          presentation: "modal",
           headerShown: false,
-          contentStyle: { backgroundColor: "transparent" },
         }}
       />
       <Stack.Screen
         name="edit-profile"
         options={{
-          presentation: "formSheet",
-          sheetAllowedDetents: [0.95],
-          sheetGrabberVisible: true,
+          presentation: "modal",
           headerShown: false,
-          contentStyle: { backgroundColor: "transparent" },
         }}
       />
     </Stack>
