@@ -7,7 +7,6 @@ import {
   Pressable,
   RefreshControl,
   Platform,
-  Alert,
   Image,
 } from 'react-native';
 import { router } from 'expo-router';
@@ -43,7 +42,7 @@ function formatDateHeader(dateStr: string): string {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const { profile, transactions, deleteTransaction, getTotalByType } = useApp();
+  const { profile, transactions, getTotalByType } = useApp();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() });
 
@@ -64,13 +63,6 @@ export default function HomeScreen() {
     });
     return Object.entries(groups).slice(0, 15);
   }, [transactions]);
-
-  const handleDelete = (id: string) => {
-    Alert.alert('Delete Transaction', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => deleteTransaction(id) },
-    ]);
-  };
 
   const handleEdit = (tx: Transaction) => {
     router.push({ pathname: '/add-transaction', params: { editId: tx.id } });
@@ -246,7 +238,6 @@ export default function HomeScreen() {
                     <TransactionRow
                       key={tx.id}
                       transaction={tx}
-                      onDelete={handleDelete}
                       onEdit={handleEdit}
                     />
                   ))}
