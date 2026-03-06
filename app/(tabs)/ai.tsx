@@ -34,6 +34,48 @@ const QUICK_PROMPTS = [
   { label: 'Healthy budget', icon: 'heart' as const, prompt: 'Am I spending within healthy limits based on my income?' },
 ];
 
+const SUGGESTION_SETS: Record<string, string[]> = {
+  spending: [
+    'How can I cut back on spending?',
+    'Which category costs the most?',
+    'Show my daily spending average',
+    'Compare to last month',
+  ],
+  income: [
+    'What percentage should I save?',
+    'Am I spending within my means?',
+    'How can I grow my income?',
+    'What is a good savings rate?',
+  ],
+  budget: [
+    'Which categories went over budget?',
+    'How can I stick to my budget?',
+    'Set a budget for a category',
+    'What should I cut first?',
+  ],
+  savings: [
+    'How much more can I save?',
+    'What is the 50/30/20 rule?',
+    'Best ways to build an emergency fund',
+    'How to automate savings?',
+  ],
+  general: [
+    'What are my top expenses?',
+    'How healthy is my budget?',
+    'Where can I save more?',
+    'Compare income vs expenses',
+  ],
+};
+
+function getSuggestions(aiResponse: string): string[] {
+  const lower = aiResponse.toLowerCase();
+  if (lower.includes('budget')) return SUGGESTION_SETS.budget;
+  if (lower.includes('sav')) return SUGGESTION_SETS.savings;
+  if (lower.includes('spend') || lower.includes('expens')) return SUGGESTION_SETS.spending;
+  if (lower.includes('income') || lower.includes('salary') || lower.includes('earn')) return SUGGESTION_SETS.income;
+  return SUGGESTION_SETS.general;
+}
+
 function TypingDots({ color }: { color: string }) {
   const dots = [
     useRef(new Animated.Value(0.3)).current,
@@ -74,6 +116,7 @@ export default function AIScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const flatListRef = useRef<FlatList>(null);
 
   const now = new Date();
@@ -84,6 +127,8 @@ export default function AIScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const trimmedText = text.trim();
+    setSuggestions([]);
+
     const currentTxs = transactions.filter(t => {
       const d = new Date(t.date);
       return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
@@ -100,6 +145,8 @@ export default function AIScreen() {
     setMessages(prev => [...prev, userMsg, assistantMsg]);
     setInput('');
     setIsLoading(true);
+
+    let finalContent = '';
 
     try {
       const baseUrl = getApiUrl();
@@ -134,6 +181,7 @@ export default function AIScreen() {
             try {
               const data = JSON.parse(line.slice(6));
               if (data.content) {
+                finalContent += data.content;
                 setMessages(prev =>
                   prev.map(m => m.id === assistantId ? { ...m, content: m.content + data.content } : m)
                 );
@@ -142,6 +190,8 @@ export default function AIScreen() {
           }
         }
       }
+
+      setSuggestions(getSuggestions(finalContent));
     } catch {
       setMessages(prev =>
         prev.map(m => m.id === assistantId
@@ -246,6 +296,36 @@ export default function AIScreen() {
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
         />
+      )}
+
+      {suggestions.length > 0 && !isLoading && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.suggestionsRow}
+          style={[styles.suggestionsScroll, { borderTopColor: theme.separator }]}
+        >
+          {suggestions.map(s => (
+            <Pressable
+              key={s}
+              onPress={() => sendMessage(s)}
+              style={({ pressed }) => [
+                styles.suggestionChip,
+                {
+                  backgroundColor: theme.isDark ? 'rgba(255,107,107,0.12)' : theme.surface,
+                  borderColor: theme.isDark ? 'rgba(255,107,107,0.3)' : theme.border,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+            >
+              <Ionicons name="arrow-forward-circle-outline" size={14} color={theme.primary} />
+              <Text style={[styles.suggestionText, { color: theme.textPrimary }]} numberOfLines={1}>
+                {s}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
       )}
 
       <View style={[styles.inputBar, { paddingBottom: tabBarHeight + 8, borderTopColor: theme.separator }]}>
@@ -410,6 +490,32 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 3.5,
+  },
+  suggestionsScroll: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: 10,
+    paddingBottom: 6,
+    flexGrow: 0,
+  },
+  suggestionsRow: {
+    paddingHorizontal: 16,
+    gap: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  suggestionChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  suggestionText: {
+    fontSize: 13,
+    fontFamily: 'Inter_500Medium',
+    maxWidth: 180,
   },
   inputBar: {
     paddingHorizontal: 16,
