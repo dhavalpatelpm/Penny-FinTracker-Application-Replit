@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp, useTheme } from '@/context/AppContext';
+import GradientBackground from '@/components/GradientBackground';
 import CategoryIcon from '@/components/CategoryIcon';
 import { getCategoryById } from '@/constants/categories';
 
@@ -121,7 +122,7 @@ export default function AddTransactionScreen() {
   const bottomPad = Platform.OS === 'web' ? 34 : Math.max(insets.bottom, 8);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+    <GradientBackground style={[styles.container, { paddingTop: insets.top }]}>
       {/* Drag handle */}
       <View style={styles.handle}>
         <View style={[styles.handleBar, { backgroundColor: theme.textTertiary }]} />
@@ -252,7 +253,7 @@ export default function AddTransactionScreen() {
           </LinearGradient>
         </Pressable>
       </View>
-    </View>
+    </GradientBackground>
   );
 }
 

@@ -18,6 +18,7 @@ import * as Haptics from 'expo-haptics';
 import { useTheme, useApp, Transaction } from '@/context/AppContext';
 import TransactionRow from '@/components/TransactionRow';
 import GlassCard from '@/components/GlassCard';
+import GradientBackground from '@/components/GradientBackground';
 import { makeShadow } from '@/utils/shadows';
 
 function getGreeting() {
@@ -82,7 +83,7 @@ export default function HomeScreen() {
     .toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <GradientBackground style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scroll, { paddingTop: topPad + 8 }]}
@@ -252,7 +253,7 @@ export default function HomeScreen() {
 
         <View style={{ height: 120 }} />
       </ScrollView>
-    </View>
+    </GradientBackground>
   );
 }
 

@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/context/AppContext';
+import GradientBackground from '@/components/GradientBackground';
 import CategoryIcon from '@/components/CategoryIcon';
 import { getCategoriesForType, type Category } from '@/constants/categories';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -45,7 +46,7 @@ export default function CategoryPickerScreen() {
   const bottomPad = Platform.OS === 'web' ? 34 : Math.max(insets.bottom, 8);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+    <GradientBackground style={[styles.container, { paddingTop: insets.top }]}>
       {/* Drag handle */}
       <View style={styles.handle}>
         <View style={[styles.handleBar, { backgroundColor: theme.textTertiary }]} />
@@ -103,7 +104,7 @@ export default function CategoryPickerScreen() {
           );
         }}
       />
-    </View>
+    </GradientBackground>
   );
 }
 

@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useTheme, useApp } from '@/context/AppContext';
 import GlassCard from '@/components/GlassCard';
+import GradientBackground from '@/components/GradientBackground';
 import CategoryIcon from '@/components/CategoryIcon';
 import { getCategoryById } from '@/constants/categories';
 import { makeShadow } from '@/utils/shadows';
@@ -56,7 +57,7 @@ export default function BudgetScreen() {
   const monthLabel = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <GradientBackground style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scroll, { paddingTop: topPad + 8 }]}
@@ -184,7 +185,7 @@ export default function BudgetScreen() {
 
         <View style={{ height: 120 }} />
       </ScrollView>
-    </View>
+    </GradientBackground>
   );
 }
 

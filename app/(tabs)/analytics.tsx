@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme, useApp } from '@/context/AppContext';
 import GlassCard from '@/components/GlassCard';
 import DonutChart from '@/components/DonutChart';
+import GradientBackground from '@/components/GradientBackground';
 import { getCategoryById } from '@/constants/categories';
 
 const PERIODS = ['Week', 'Month', 'Year'] as const;
@@ -73,7 +74,7 @@ export default function AnalyticsScreen() {
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+    <GradientBackground style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scroll, { paddingTop: topPad + 8 }]}
@@ -178,7 +179,7 @@ export default function AnalyticsScreen() {
 
         <View style={{ height: 120 }} />
       </ScrollView>
-    </View>
+    </GradientBackground>
   );
 }
 

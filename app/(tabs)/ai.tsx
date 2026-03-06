@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useTheme, useApp } from '@/context/AppContext';
 import { getApiUrl } from '@/lib/query-client';
+import GradientBackground from '@/components/GradientBackground';
 
 interface Message {
   id: string;
@@ -186,8 +187,9 @@ export default function AIScreen() {
   };
 
   return (
+    <GradientBackground style={styles.container}>
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.background }]}
+      style={styles.flex}
       behavior="padding"
       keyboardVerticalOffset={0}
     >
@@ -279,11 +281,13 @@ export default function AIScreen() {
         </View>
       </View>
     </KeyboardAvoidingView>
+    </GradientBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  flex: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

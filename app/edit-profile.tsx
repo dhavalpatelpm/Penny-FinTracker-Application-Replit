@@ -18,6 +18,7 @@ import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp, useTheme } from '@/context/AppContext';
+import GradientBackground from '@/components/GradientBackground';
 
 const PROFESSIONS = [
   'Student', 'Employed', 'Self-employed', 'Freelancer',
@@ -165,7 +166,7 @@ export default function EditProfileScreen() {
   const initial = name ? name.charAt(0).toUpperCase() : 'P';
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.background, paddingTop: insets.top }]}>
+    <GradientBackground style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: topPad + 16 }]}>
         <Pressable onPress={() => router.back()} style={styles.closeBtn} testID="close-edit-profile">
@@ -384,7 +385,7 @@ export default function EditProfileScreen() {
           </LinearGradient>
         </Pressable>
       </ScrollView>
-    </View>
+    </GradientBackground>
   );
 }
 
